@@ -5,7 +5,18 @@ from different providers.
 
 ### Setup
 
+Run `docker-compose up` command to run containerized services. You can use `docker-compose down` command to stop services.
+
+#### Requirements
+
+- Docker
+- Gradle
+
 ### Usage
+
+Kafka Cluster and related components can be monitored and managed by Landoop UI at `http://localhost:3030/`. This UI helps us to see topics, schemas and connectors.
+
+![Kafka Landoop UI](assets/landoop-ui.png)
 
 ##### Retrieve All Data
 

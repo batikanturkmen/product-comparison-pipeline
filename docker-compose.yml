@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  kafka-cluster:
+    image: landoop/fast-data-dev:2.5.1
+    environment:
+      ADV_HOST: 127.0.0.1
+      RUNTESTS: 0                 # Disable Running tests so the cluster starts faster
+      SAMPLEDATA: 0
+    ports:
+      - 2181:2181                 # Zookeeper
+      - 3030:3030                 # Landoop UI
+      - 8081-8083:8081-8083       # REST Proxy, Schema Registry, Kafka Connect ports
+      - 9581-9585:9581-9585       # JMX Ports
+      - 9092:9092                 # Kafka Broker
+
+  cassandra:
+    container_name: cassandra
+    image: bitnami/cassandra:3.11.9
+    ports:
+      - '7000:7000'
+      - '9042:9042'
+    volumes:
+      - 'cassandra_data:/bitnami'
+    environment:
+      - CASSANDRA_SEEDS=cassandra
+      - CASSANDRA_PASSWORD_SEEDER=yes
+      - CASSANDRA_PASSWORD=cassandra
+volumes:
+  cassandra_data:
+    driver: local
