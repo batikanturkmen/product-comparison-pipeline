@@ -49,7 +49,7 @@ Another significant enrichment that applied to data is adding ML score of the pr
 
 #### Serving
 
-Users can access our data using REST API. Spring Boot is used to handle these requests and database connection.
+Users can access our data using REST API. [Spring Boot](https://spring.io/projects/spring-boot) is used to handle these requests and database connection.
 
 #### Future works
  - Elasticsearch can be added to retrieve related results.
