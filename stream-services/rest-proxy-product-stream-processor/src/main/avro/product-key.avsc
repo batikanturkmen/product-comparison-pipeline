@@ -1,0 +1,23 @@
+{
+   "namespace":"com.relayr.product.models",
+   "type":"record",
+   "name":"ProductKey",
+   "fields":[
+        {
+            "name":"product",
+            "type":"string"
+        },
+        {
+            "name":"brand",
+            "type":"string"
+        },
+        {
+            "name":"source",
+            "type":"string"
+        },
+        {
+            "name":"category",
+            "type":"string"
+        }
+   ]
+}
