@@ -1,0 +1,45 @@
+{
+   "namespace":"com.relayr.product.models",
+   "type":"record",
+   "name":"Product",
+   "fields":[
+        {
+            "name":"created_at",
+            "type":"long",
+            "logicalType":"timestamp-millis"
+        },
+        {
+            "name":"id",
+            "type":"string",
+            "logicalType": "UUID"
+        },
+        {
+            "name":"product",
+            "type":"string"
+        },
+        {
+            "name":"brand",
+            "type":"string"
+        },
+        {
+            "name":"source",
+            "type":"string"
+        },
+        {
+            "name":"category",
+            "type":"string"
+        },
+        {
+            "name":"price",
+            "type":"float"
+        },
+        {
+            "name":"recommendation_score",
+            "type":"float"
+        },
+        {
+            "name": "additional",
+            "type": "string"
+        }
+   ]
+}

@@ -1,6 +1,15 @@
 version: '2'
 
 services:
+  file-stream-processor:
+    container_name: kafka-file-stream-processor
+    build:
+      context: ./stream-services/file-product-stream-processor
+    depends_on:
+      - kafka-cluster
+#    networks:
+#      - kafka-network
+
   kafka-cluster:
     image: landoop/fast-data-dev:2.5.1
     environment:
@@ -13,6 +22,8 @@ services:
       - 8081-8083:8081-8083       # REST Proxy, Schema Registry, Kafka Connect ports
       - 9581-9585:9581-9585       # JMX Ports
       - 9092:9092                 # Kafka Broker
+#    networks:
+#      - kafka-network
 
   cassandra:
     container_name: cassandra
@@ -31,3 +42,6 @@ services:
 volumes:
   cassandra_data:
     driver: local
+#networks:
+#  kafka-network:
+#    driver: bridge
