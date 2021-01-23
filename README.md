@@ -62,7 +62,9 @@ curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
   }]
 }' "http://localhost:8082/topics/jsontest2"
   {"offsets":[{"partition":0,"offset":0,"error_code":null,"error":null}],"key_schema_id":null,"value_schema_id":null}
+```
 
+```
 
 curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
       --data '{
@@ -81,6 +83,9 @@ curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
 }' "http://localhost:8082/topics/jsontest2"
   {"offsets":[{"partition":0,"offset":0,"error_code":null,"error":null}],"key_schema_id":null,"value_schema_id":null}
 
+```
+
+```
 
 curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
       --data '{
@@ -112,7 +117,10 @@ curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
 - Stream Services
     - File Stream Processor: Process the data coming from file.
     - Rest Proxy Stream Processor: Process the data comming through rest proxy.
-
+- Backend Services
+    - API Gateway: Spring Cloud API Gateway to be able to tracing, routing and load balancing.
+    - Naming Service: Service discovery for API Gateway.
+    - Product Retrieval Service: Retrieve products with name and category parameters.
 #### Integration
 
 The pipeline supports reading and writing various data sources thanks to [Kafka Connectors](https://docs.confluent.io/platform/current/connect/index.html) for importing new product data.
