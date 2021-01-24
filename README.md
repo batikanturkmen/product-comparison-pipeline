@@ -11,25 +11,29 @@ from different providers.
 - Gradle
 - Java 8
 
-###### 1 Run dockerized services
+##### 1 Run dockerized services
 
 The project uses Apache Kafka and Cassandra services as docker containers. Run `docker-compose up` command to run containerized services. 
 It takes about 3 to 5 minutes for all services to run on a computer. You should see `exit status 0; expected` in the terminal to proceed next step.
  
 Kafka Cluster and related components can be monitored and managed by Landoop UI at `http://localhost:3030/`. This UI helps us to see topics, schemas and connectors.
 
+Example  kafka cluster status view
 ![Kafka Landoop UI](assets/landoop-ui.png)
+
+Example topic view
+![Kafka Landoop Topics](assets/landoop-topic.png)
 
 Note: You can use `docker-compose down` command to stop services.
 
-###### 2 Create topics and connectors in the container
+##### 2 Create topics and connectors in the container
 
 Run `chmod +x init-cluster.sh` than `./init-cluster.sh` to create worker, topics and connectors.
 
 Note: If streaming applications are run without the header being created, these applications will close itself shortly after running. 
 Please make sure to create headers that the streamers will consume before moving on to the next step.
 
-###### 3 Build and run spring boot applications
+##### 3 Build and run spring boot applications
 
 For building all applications use `gradle build` and after building run these applications with `gradle bootRun` command.
 Thanks to the multi-project structure provided by gradle, it is enough to run these commands only once in the root directory.
@@ -37,15 +41,17 @@ Thanks to the multi-project structure provided by gradle, it is enough to run th
 
 ### Usage
 
+##### Compare Product
 
-
-##### Retrieve All Data
+User gets desired product from different providers such as web site and retail shops.
+The result returns all information about product and user can compare data.
 
 ```
-Endpoint: /products
+Endpoint: [GATEWAY]/product-retrieval-service/compare/category/[CATEGORY]/product/[product]
 Type: GET
 
-http://localhost:9089/products
+Example Query:
+localhost:8765/product-retrieval-service/compare/category/electronics/product/iphone
 ```
 
 ###### Example data for text file.
@@ -141,6 +147,12 @@ curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
     - API Gateway: Spring Cloud API Gateway to be able to tracing, routing and load balancing.
     - Naming Service: Service discovery for API Gateway.
     - Product Retrieval Service: Retrieve products with name and category parameters.
+
+#### Streaming
+
+[Apache Kafka](https://kafka.apache.org/) is the backbone of the project. Thanks to kafka high available and high throughput system with easy scalability and maintainability. 
+Not only Apache Kafka but also Kafka Streams and Kafka Connectors are used to generate robust architecture. 
+    
 #### Integration
 
 The pipeline supports reading and writing various data sources thanks to [Kafka Connectors](https://docs.confluent.io/platform/current/connect/index.html) for importing new product data.
@@ -151,6 +163,9 @@ Moreover, data also can be send by through [Kafka Rest Proxy](https://docs.confl
 
 To be able to process the raw data written in the Kafka Topics, [Kafka Streams](https://docs.confluent.io/platform/current/streams/index.html) are used.
 Stream processor, clean and validate data with basic checks, enrich it by adding timestamp and source information and convert it to [Apache Avro](https://avro.apache.org/) format.
+Since products can have very different properties from each other, we put these properties as json in the additional field. 
+At first we designed the system using map structure which is supported by both Avro and Cassandra. However, kafka connector does not allow maps, so we use json format for additional information.
+All processed data is sent to the same topic with different source labels.
 
 Another significant enrichment that applied to data is adding ML score of the provider. *(In this project, did not train any model, all scores is given constantly for demonstration purpose.)*
 
@@ -173,18 +188,35 @@ All data in database
 Sample filtered data on database
 
 ![Iphone selection in database](assets/filtered-data.png)
+
+If you want to connect database command as follows
+```
+docker exec -it cassandra bash
+cqlsh -u cassandra -p cassandra
+use producttracker;
+select * from products;
+select * from products where category='electronics' and product='iphone' ALLOW FILTERING;
+```
 #### Serving
 
-Users can access our data using REST API. [Spring Boot](https://spring.io/projects/spring-boot) is used to handle these requests and database connection.
+Users can access our data using REST API. [Spring Boot](https://spring.io/projects/spring-boot) is used to handle these requests and database connection. 
+Spring boot ease production ready app development with its architecture and modules such as load-balancer and cassandra connector.
 
 Sample request and response
 
 ![Endpoint get request results](assets/endpoint-results.png)
 
-#### Service Discovery 
 
-#### Load Balancing
+#### Service Discovery and Load Balancing
 
+Spring Cloud API Gateway helps us to distribute coming request to the different services with implementing simple route path.
+If there is more than one instances from the required service, gateway discover it thanks to service discovery and balance the load among the services.
+[Netflix Eureka](https://spring.io/projects/spring-cloud-netflix) service discovery mechanism is used in this project.
+These architecture helps us to use more robust system and when load is increased, we can easily handle it.
+
+Service discovery page
+
+![Eureka Service Discovery](assets/eureka-service-discovery.png)
 
 #### Ports
 

@@ -15,7 +15,7 @@ public class ProductController {
     @Autowired
     ProductRepository productRepository;
 
-    @GetMapping("/product/category/{category}/product/{product}")
+    @GetMapping("/compare/category/{category}/product/{product}")
     public List<ProductModel> getProductByBrand(
             @PathVariable("category") String category,
             @PathVariable("product") String product) {
