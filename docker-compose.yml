@@ -11,11 +11,14 @@ services:
 #      - kafka-network
 
   kafka-cluster:
+    container_name: kafka-cluster
     image: landoop/fast-data-dev:2.5.1
     environment:
       ADV_HOST: 127.0.0.1
       RUNTESTS: 0                 # Disable Running tests so the cluster starts faster
       SAMPLEDATA: 0
+    volumes:
+    - ./connector:/kafka-config
     ports:
       - 2181:2181                 # Zookeeper
       - 3030:3030                 # Landoop UI

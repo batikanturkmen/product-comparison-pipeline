@@ -5,19 +5,39 @@ from different providers.
 
 ### Setup
 
-Run `docker-compose up` command to run containerized services. You can use `docker-compose down` command to stop services.
-
 #### Requirements
 
 - Docker
 - Gradle
 - Java 8
 
-### Usage
+###### 1 Run dockerized services
 
+The project uses Apache Kafka and Cassandra services as docker containers. Run `docker-compose up` command to run containerized services. 
+It takes about 3 to 5 minutes for all services to run on a computer. You should see `exit status 0; expected` in the terminal to proceed next step.
+ 
 Kafka Cluster and related components can be monitored and managed by Landoop UI at `http://localhost:3030/`. This UI helps us to see topics, schemas and connectors.
 
 ![Kafka Landoop UI](assets/landoop-ui.png)
+
+Note: You can use `docker-compose down` command to stop services.
+
+###### 2 Create topics and connectors in the container
+
+Run `chmod +x init-cluster.sh` than `./init-cluster.sh` to create worker, topics and connectors.
+
+Note: If streaming applications are run without the header being created, these applications will close itself shortly after running. 
+Please make sure to create headers that the streamers will consume before moving on to the next step.
+
+###### 3 Build and run spring boot applications
+
+For building all applications use `gradle build` and after building run these applications with `gradle bootRun` command.
+Thanks to the multi-project structure provided by gradle, it is enough to run these commands only once in the root directory.
+
+
+### Usage
+
+
 
 ##### Retrieve All Data
 
@@ -60,7 +80,7 @@ curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
       }
     }
   }]
-}' "http://localhost:8082/topics/jsontest2"
+}' "http://localhost:8082/topics/bestbuy-products-raw"
   {"offsets":[{"partition":0,"offset":0,"error_code":null,"error":null}],"key_schema_id":null,"value_schema_id":null}
 ```
 
@@ -80,7 +100,7 @@ curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
       }
     }
   }]
-}' "http://localhost:8082/topics/jsontest2"
+}' "http://localhost:8082/topics/bestbuy-products-raw"
   {"offsets":[{"partition":0,"offset":0,"error_code":null,"error":null}],"key_schema_id":null,"value_schema_id":null}
 
 ```
@@ -92,8 +112,8 @@ curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
   "records": [{
     "value": {
       "category": "electronics",
-      "brand": "ipad",
-      "product": "apple",
+      "brand": "apple",
+      "product": "iPad",
       "price": 1378.3,
       "additional": {
         "color": "red",
@@ -101,7 +121,7 @@ curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
       }
     }
   }]
-}' "http://localhost:8082/topics/jsontest2"
+}' "http://localhost:8082/topics/bestbuy-products-raw"
   {"offsets":[{"partition":0,"offset":0,"error_code":null,"error":null}],"key_schema_id":null,"value_schema_id":null}
 
 ```
@@ -163,7 +183,7 @@ Sample request and response
 
 #### Service Discovery 
 
-
+#### Load Balancing
 
 
 #### Ports
