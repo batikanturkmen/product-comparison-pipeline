@@ -11,3 +11,6 @@ pluginManagement {
 rootProject.name = 'product-comparison-pipeline'
 include 'stream-services:file-product-stream-processor'
 include 'stream-services:rest-proxy-product-stream-processor'
+include 'serving-services:api-gateway'
+include 'serving-services:naming-server'
+include 'serving-services:product-retrieval-service'
