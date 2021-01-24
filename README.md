@@ -138,6 +138,28 @@ Another significant enrichment that applied to data is adding ML score of the pr
 
 Users can access our data using REST API. [Spring Boot](https://spring.io/projects/spring-boot) is used to handle these requests and database connection.
 
+#### Service Discovery 
+
+![Service Discovery](assets/eureka-service-discovery.png)
+
+
+#### Ports
+
+| Service 	| Port 	|
+|-	|-	|
+| **Serving** 	  	|
+| Eureka Service Discovery Web 	| 8761 	|
+| API Gateway 	| 8765 	|
+| Product Retrieval Service 	| 8000 	|
+| **Kafka** 	  	|
+| Kafka Broker 	| 9092 	|
+| Kafka Rest Proxy 	| 8081 	|
+| Kafka Schema Registry 	| 8082 	|
+| Kafka Connect 	| 8083 	|
+| **Data** 	  	|
+| Cassandra 	| 9042 	|
+| Cassandra Cluster Communication 	| 7000 	|
+
 #### Future works
  - Elasticsearch can be added to retrieve related results.
  - Kubernetes scripts can be developed to run application on the Kubernetes Clusters.
