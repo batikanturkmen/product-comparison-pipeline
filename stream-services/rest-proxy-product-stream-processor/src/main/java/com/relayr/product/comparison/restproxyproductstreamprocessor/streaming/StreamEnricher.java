@@ -9,6 +9,8 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -24,16 +27,14 @@ public class StreamEnricher {
 
     @Value("#{kafkaConfig.getStreamInputTopicName()}")
     private String streamInputTopicName;
-
     @Value("#{kafkaConfig.getStreamOutputTopicName()}")
     private String streamOutputTopicName;
-
     @Value("#{kafkaConfig.getDataSourceName()}")
     private String dataSourceName;
 
+    private ObjectMapper mapper = new ObjectMapper();
     // declare mock machine learning model results for demonstration purpose.
     private static Map<String, Integer> mlScoreMap;
-
     // initialize mock machine learning model results for demonstration purpose.
     static {
         mlScoreMap = new HashMap<>();
@@ -41,103 +42,89 @@ public class StreamEnricher {
         mlScoreMap.put("bestbuy", 7);
     }
 
-    private static ObjectMapper mapper = new ObjectMapper(); // TODO bunu bean vs bır sey yap
+    Logger logger = LoggerFactory.getLogger(StreamEnricher.class);
 
-    // TODO extra verilerde neler olmali ve nasil store edilmeli bak
     @Bean
     public KStream<ProductKey, Product> kStream(StreamsBuilder kStreamBuilder) {
 
-
         KStream<ProductKey, Product> convertedStream = kStreamBuilder
                 .stream(streamInputTopicName, Consumed.with(Serdes.String(), Serdes.String()))
-                .filter((key, value) -> StreamEnricher.checkValidity(value))
-                .selectKey((key, value) -> StreamEnricher.convertKeyToAvro(value))
-                .mapValues(StreamEnricher::convertValueToAvro);
-
+                .filter((key, value) -> this.checkValidity(value))
+                .mapValues(this::valueTransformation)
+                .mapValues(this::convertValueToAvro)
+                .selectKey((key, value) -> this.convertKeyToAvro(value));
 
         convertedStream.to(streamOutputTopicName);
 
         return convertedStream;
     }
 
-    private static boolean checkValidity(String value) {
-
-        System.out.println("Gelen veri: " + value);
+    private boolean checkValidity(String value) {
 
         // check line emptiness
         if (value.trim().isEmpty()) {
             return false;
         }
 
+        // if there is exception, filter out.
+        if (!this.convertToModel(value).isPresent()){
+            return false;
+        }
         return true;
     }
 
+    private String valueTransformation(String value){
 
-    // TODO belki interface yapilip commona alinabilir
-    private static ProductKey convertKeyToAvro(String value) {
+        return value
+                .trim()
+                .toLowerCase();
+    }
 
-        ProductModel productModel = null;
+    private Optional<ProductModel> convertToModel(String value){
+        Optional<ProductModel> productModel = Optional.empty();
 
-
-        // TODO bu islemi iki kere yapmak mantikli olmayabilir
-        // TODO ne doncen dusun
         try {
-            productModel = mapper.readValue(value, ProductModel.class);
+            productModel = Optional.of(mapper.readValue(value, ProductModel.class));
         } catch (JsonProcessingException e) {
-            e.printStackTrace(); // TODO handle et duzgun sekilde
+            if (logger.isWarnEnabled()){
+                logger.warn(e.toString());
+            }
         }
 
-        System.out.println("Donusturulen " + productModel.toString());
+        return productModel;
+    }
 
-        String dataSourceName = "bestbuy"; //TODO
+    private ProductKey convertKeyToAvro(Product product) {
 
         return ProductKey
                 .newBuilder()
                 .setSource(dataSourceName)
-                .setCategory(productModel.getCategory())
-                .setBrand(productModel.getBrand())
-                .setProduct(productModel.getProduct())
+                .setCategory(product.getCategory())
+                .setBrand(product.getBrand())
+                .setProduct(product.getProduct())
                 .build();
     }
 
-    private static Product convertValueToAvro(String value) {
+    private Product convertValueToAvro(String value) {
+        Optional<ProductModel> productModel = this.convertToModel(value);
 
-        ProductModel productModel = null;
-
-
-        // TODO bu islemi iki kere yapmak mantikli olmayabilir
-        // TODO ne doncen dusun
-        try {
-            productModel = mapper.readValue(value, ProductModel.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace(); // TODO handle et duzgun sekilde
-        }
-
-        System.out.println("Donusturulen " + productModel.toString());
-
-
-        String dataSourceName = "bestbuy"; //TODO
-
+        // get directly, because checked data validity in previous steps.
         return Product.newBuilder()
                 .setSource(dataSourceName)
-                .setCategory(productModel.getCategory())
-                .setBrand(productModel.getBrand())
-                .setProduct(productModel.getProduct())
+                .setCategory(productModel.get().getCategory())
+                .setBrand(productModel.get().getBrand())
+                .setProduct(productModel.get().getProduct())
                 .setCreatedAt(ZonedDateTime.now().toInstant().toEpochMilli())
                 .setId(UUID.randomUUID().toString())
-                .setPrice(productModel.getPrice())
+                .setPrice(productModel.get().getPrice())
                 .setRecommendationScore(mlScoreMap.getOrDefault(dataSourceName, 5))
-                .setAdditional(StreamEnricher.converMap(productModel.getAdditional()))
+                .setAdditional(this.convertMap(productModel.get().getAdditional()))
                 .build();
     }
 
-
-    //TODO daha temiz cozebilirsen bak
-    // TODO DB icin ayni donusumu yapiyor mu bak
-    public static String converMap(Map<String, String> map) {
-        String mapAsString = map.keySet().stream()
-                .map(key -> key + "=" + map.get(key))
+    public String convertMap(Map<String, String> map) {
+        return map.keySet().stream()
+                .map(key -> "\"" + key + "\":\"" + map.get(key) + "\"")
                 .collect(Collectors.joining(", ", "{", "}"));
-        return mapAsString;
     }
 }
