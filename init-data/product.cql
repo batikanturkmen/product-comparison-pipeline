@@ -8,14 +8,14 @@ CREATE KEYSPACE producttracker WITH replication = {
 USE producttracker;
 
 CREATE TABLE products (
-  id text,
-  created_at bigint,
-  source text,
-  brand text,
-  product text,
-  category text,
-  price float,
-  recommendation_score float,
-  additional text,
-PRIMARY KEY (category, product))
-WITH CLUSTERING ORDER BY (product DESC);
+id text,
+created_at bigint,
+source text,
+brand text,
+product text,
+category text,
+price float,
+recommendation_score float,
+additional text,
+PRIMARY KEY ((category, product, source), recommendation_score))
+WITH CLUSTERING ORDER BY (recommendation_score ASC);

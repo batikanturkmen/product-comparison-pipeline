@@ -1,12 +1,12 @@
 version: '2'
 
 services:
-  file-stream-processor:
-    container_name: kafka-file-stream-processor
-    build:
-      context: ./stream-services/file-product-stream-processor
-    depends_on:
-      - kafka-cluster
+#  file-stream-processor:
+#    container_name: kafka-file-stream-processor
+#    build:
+#      context: ./stream-services/file-product-stream-processor
+#    depends_on:
+#      - kafka-cluster
 #    networks:
 #      - kafka-network
 

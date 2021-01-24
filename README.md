@@ -134,13 +134,36 @@ Stream processor, clean and validate data with basic checks, enrich it by adding
 
 Another significant enrichment that applied to data is adding ML score of the provider. *(In this project, did not train any model, all scores is given constantly for demonstration purpose.)*
 
+#### Storage
+
+In this project, there are different data sources and different data structures. We are expecting high available system with massive data loads.
+For these reasons, I choose [Cassandra](https://cassandra.apache.org/). Moreover, [Relayr](https://relayr.io/) uses it and during this project gives me an opportunity to learn it.
+I choose following key structure;
+
+- Category, product, source as primary key
+- Recommendation score from machine learning model as clustering key
+
+Category, product and source ensure uniqueness and recommendation score helps to clustering from high to low.
+ n the other hand, I do not use source in the Rest API to decrease complexity. I is clear that this approach has some drawbacks on performance.
+
+All data in database
+
+![Data from different sources in database](assets/all-data-in-database.png)
+
+Sample filtered data on database
+
+![Iphone selection in database](assets/filtered-data.png)
 #### Serving
 
 Users can access our data using REST API. [Spring Boot](https://spring.io/projects/spring-boot) is used to handle these requests and database connection.
 
+Sample request and response
+
+![Endpoint get request results](assets/endpoint-results.png)
+
 #### Service Discovery 
 
-![Service Discovery](assets/eureka-service-discovery.png)
+
 
 
 #### Ports
@@ -156,6 +179,7 @@ Users can access our data using REST API. [Spring Boot](https://spring.io/projec
 | Kafka Rest Proxy 	| 8081 	|
 | Kafka Schema Registry 	| 8082 	|
 | Kafka Connect 	| 8083 	|
+| Kafka Connect UI 	| 3030 	|
 | **Data** 	  	|
 | Cassandra 	| 9042 	|
 | Cassandra Cluster Communication 	| 7000 	|
