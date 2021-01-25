@@ -47,23 +47,11 @@ There are two way to load data to the pipeline.
 
 ##### Using file
 
+Added CSV formatted data to the [connector/source-file.csv](connector/source-file.csv) file. All data added to the file are considered to come from Medimarkt provider. Added data is produced on mediamarkt-products-raw topic thanks to connectors.
 
-##### Using REST endpoint
+category,brand,product,price,additional_information
 
-
-
-#### Compare Product
-
-User gets desired product from different providers such as web site and retail shops.
-The result returns all information about product and user can compare data.
-
-```
-Endpoint: [GATEWAY]/product-retrieval-service/compare/category/[CATEGORY]/product/[product]
-Type: GET
-
-Example Query:
-localhost:8765/product-retrieval-service/compare/category/electronics/product/iphone
-```
+additional_information must be a key value pair and it can be from zero to many. (i.e. engine,electric,color,gray,model,sedan)
 
 ###### Example data for text file.
 
@@ -78,6 +66,10 @@ automotive,tesla,models,42090,engine,electric,color,gray,model,sedan
 automotive,tesla,modelx,42090,engine,electric,color,gray,model,sedan
 automotive,tesla,modelY,43090.6,engine,electric,color,gray,model,sedan
 ```
+
+##### Using REST endpoint
+
+Making POST request from the terminal to the "bestbut-products-raw" topic. All requests made are considered to be from Bestbuy provider.
 
 ###### Example data for REST Proxy.
 
@@ -143,6 +135,19 @@ curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
 
 ```
 
+#### Compare Product
+
+User gets desired product from different providers such as web site and retail shops.
+The result returns all information about product and user can compare data.
+
+```
+Endpoint: [GATEWAY]/product-retrieval-service/compare/category/[CATEGORY]/product/[product]
+Type: GET
+
+Example Query:
+localhost:8765/product-retrieval-service/compare/category/electronics/product/iphone
+```
+
 ### Technical Details
 
 #### Pipeline of the project
@@ -170,10 +175,12 @@ The pipeline supports reading and writing various data sources thanks to [Kafka 
 In the project *File Stream Connector* is used to read data from file and *Cassandra Connector* is used to write processed data to the Cassandra as persistent storage.
 Moreover, data also can be send by through [Kafka Rest Proxy](https://docs.confluent.io/platform/current/kafka-rest/index.html).
 
+According to the project structure, the raw data provided by all data providers will be written in a specific Kafka topic and a stream processing module will run for each raw topic. Stream processor configurations can be changed easily with config files.([File Streaming Config](stream-services/file-product-stream-processor/src/main/resources/application.properties), [REST Streaming Config](stream-services/rest-proxy-product-stream-processor/src/main/resources/application.properties)). On the other hand, all processed data written into the same topic to send cassandra database.
+
 #### Validation and Enrichment
 
 To be able to process the raw data written in the Kafka Topics, [Kafka Streams](https://docs.confluent.io/platform/current/streams/index.html) are used.
-Stream processor, clean and validate data with basic checks, enrich it by adding timestamp and source information and convert it to [Apache Avro](https://avro.apache.org/) format.
+Stream processor, clean and validate data with basic checks, enrich it by adding timestamp and source information and convert it to [Apache Avro](https://avro.apache.org/) format by using models that automatically generated avro plugin.
 Since products can have very different properties from each other, we put these properties as json in the additional field. 
 At first we designed the system using map structure which is supported by both Avro and Cassandra. However, kafka connector does not allow maps, so we use json format for additional information.
 All processed data is sent to the same topic with different source labels.
@@ -251,4 +258,5 @@ Service discovery page
  - Elasticsearch can be added to retrieve related results.
  - Kubernetes scripts can be developed to run application on the Kubernetes Clusters.
  - More automation can be done to run application with a single command.
- - Testcontainers can be used to test with mock kafka and cassandra instances.
+ - Use common module for gadle projects.
+ - Testcontainers can be used for integration tests to test with kafka and cassandra instances.
