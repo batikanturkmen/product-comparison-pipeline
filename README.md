@@ -258,5 +258,5 @@ Service discovery page
  - Elasticsearch can be added to retrieve related results.
  - Kubernetes scripts can be developed to run application on the Kubernetes Clusters.
  - More automation can be done to run application with a single command.
- - Use common module for gadle projects.
+ - Use common module for gradle projects.
  - Testcontainers can be used for integration tests to test with kafka and cassandra instances.
