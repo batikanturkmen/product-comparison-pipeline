@@ -47,7 +47,7 @@ There are two way to load data to the pipeline.
 
 ##### Using file
 
-Added CSV formatted data to the [connector/source-file.csv](connector/source-file.csv) file. All data added to the file are considered to come from Medimarkt provider. Added data is produced on mediamarkt-products-raw topic thanks to connectors.
+Added CSV formatted data to the [connector/source-file.csv](connector/source-file.csv) file. All data added to the file are considered to come from Mediamarkt provider. Added data is produced on mediamarkt-products-raw topic thanks to connectors.
 
 category,brand,product,price,additional_information
 
