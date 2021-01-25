@@ -10,6 +10,52 @@ services:
 #    networks:
 #      - kafka-network
 
+#  rest-proxy-product-stream-processor:
+#    container_name: rest-proxy-product-stream-processor
+#    build:
+#      context: ./stream-services/rest-proxy-product-stream-processor
+#    depends_on:
+#      - kafka-cluster
+#    networks:
+#      - kafka-network
+
+#  product-retrieval-service:
+#    container_name: product-retrieval-service
+#    build:
+#      context: ./serving-services/product-retrieval-service
+#    ports:
+#      - "8000:8000"
+#    networks:
+#      - kafka-network
+#    depends_on:
+#      - kafka-cluster
+#      - naming-server
+#    environment:
+#      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+
+#  api-gateway:
+#    container_name: api-gateway
+#    build:
+#      context: ./serving-services/api-gateway
+#    ports:
+#      - "8765:8765"
+#    networks:
+#      - kafka-network
+#    depends_on:
+#      - kafka-cluster
+#      - naming-server
+#    environment:
+#      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+
+#  naming-server:
+#    container_name: naming-serve
+#    build:
+#      context: ./serving-services/naming-serve
+#    ports:
+#      - "8761:8761"
+#    networks:
+#      - kafka-network
+
   kafka-cluster:
     container_name: kafka-cluster
     image: landoop/fast-data-dev:2.5.1
