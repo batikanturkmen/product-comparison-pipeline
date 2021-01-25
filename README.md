@@ -41,7 +41,18 @@ Thanks to the multi-project structure provided by gradle, it is enough to run th
 
 ### Usage
 
-##### Compare Product
+#### Load Data
+
+There are two way to load data to the pipeline.
+
+##### Using file
+
+
+##### Using REST endpoint
+
+
+
+#### Compare Product
 
 User gets desired product from different providers such as web site and retail shops.
 The result returns all information about product and user can compare data.

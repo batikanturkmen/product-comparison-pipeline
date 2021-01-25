@@ -56,7 +56,7 @@ public class StreamEnricher {
         return convertedStream;
     }
 
-    private boolean checkValidity(String value) {
+    protected boolean checkValidity(String value) {
 
         // check line emptiness
         if (value.trim().isEmpty()) {
@@ -69,7 +69,7 @@ public class StreamEnricher {
         return true;
     }
 
-    private String valueTransformation(String value){
+    protected String valueTransformation(String value){
 
         return value
                 .trim()
@@ -77,7 +77,7 @@ public class StreamEnricher {
                 .toLowerCase();
     }
 
-    private ProductKey convertKeyToAvro(Product value) {
+    protected ProductKey convertKeyToAvro(Product value) {
 
         return ProductKey
                 .newBuilder()
@@ -88,7 +88,7 @@ public class StreamEnricher {
                 .build();
     }
 
-    private Product convertValueToAvro(String value) {
+    protected Product convertValueToAvro(String value) {
 
         return Product.newBuilder()
                 .setSource(dataSourceName)
@@ -103,8 +103,7 @@ public class StreamEnricher {
                 .build();
     }
 
-    // i would write this more clearly if I had time.
-    private String additionalDataParser(String value) {
+    protected String additionalDataParser(String value) {
 
         // means no additional data
         if (value.split(",").length < 5) {

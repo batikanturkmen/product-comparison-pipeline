@@ -59,7 +59,7 @@ public class StreamEnricher {
         return convertedStream;
     }
 
-    private boolean checkValidity(String value) {
+    protected boolean checkValidity(String value) {
 
         // check line emptiness
         if (value.trim().isEmpty()) {
@@ -73,14 +73,14 @@ public class StreamEnricher {
         return true;
     }
 
-    private String valueTransformation(String value){
+    protected String valueTransformation(String value){
 
         return value
                 .trim()
                 .toLowerCase();
     }
 
-    private Optional<ProductModel> convertToModel(String value){
+    protected Optional<ProductModel> convertToModel(String value){
         Optional<ProductModel> productModel = Optional.empty();
 
         try {
@@ -94,7 +94,7 @@ public class StreamEnricher {
         return productModel;
     }
 
-    private ProductKey convertKeyToAvro(Product product) {
+    protected ProductKey convertKeyToAvro(Product product) {
 
         return ProductKey
                 .newBuilder()
@@ -105,7 +105,7 @@ public class StreamEnricher {
                 .build();
     }
 
-    private Product convertValueToAvro(String value) {
+    protected Product convertValueToAvro(String value) {
         Optional<ProductModel> productModel = this.convertToModel(value);
 
         // get directly, because checked data validity in previous steps.
@@ -122,7 +122,7 @@ public class StreamEnricher {
                 .build();
     }
 
-    public String convertMap(Map<String, String> map) {
+    protected String convertMap(Map<String, String> map) {
         return map.keySet().stream()
                 .map(key -> "\"" + key + "\":\"" + map.get(key) + "\"")
                 .collect(Collectors.joining(", ", "{", "}"));
